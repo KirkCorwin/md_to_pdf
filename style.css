@@ -1,0 +1,171 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #1a1b1e;
+  --panel: #25262b;
+  --text: #e9e9ec;
+  --muted: #909296;
+  --accent: #4c6ef5;
+  --accent-dim: #364fc7;
+  --danger: #fa5252;
+  --border: #373a40;
+  --font: "Segoe UI", system-ui, sans-serif;
+  --mono: "Cascadia Code", "Consolas", monospace;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin: 0 0 1.25rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.mode-group {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mode-group button {
+  border: none;
+  background: var(--panel);
+  color: var(--muted);
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.mode-group button:hover {
+  color: var(--text);
+  background: #2c2e33;
+}
+
+.mode-group button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.filename-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.filename-hint input {
+  flex: 1 1 10rem;
+  min-width: 8rem;
+  max-width: 22rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  color: #c5c7ce;
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.filename-hint input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  color: var(--text);
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.primary:hover {
+  background: var(--accent-dim);
+}
+
+button.primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+label[for="md"] {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+#md {
+  width: 100%;
+  min-height: 280px;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+#md:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.hint {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
