@@ -85,8 +85,11 @@ function blendLayout(loose, tight, t) {
 /** Tight side margins; ~50% of ultra’s line/gap condensing; education split; Focus on own line */
 const RESUME_COMPACT_LAYOUT = blendLayout(COVER_LAYOUT, RESUME_ULTRA_LAYOUT, 0.5);
 
-/** Resume preprocess: separates school (left) from joined sub-lines (right) for pdfmake columns */
-const EDU_ROW_MARKER = "\u001E";
+function eduRowMarker() {
+  return typeof EducationPreprocess !== "undefined"
+    ? EducationPreprocess.EDU_ROW_MARKER
+    : "\u001E";
+}
 
 function layoutForMode(docMode) {
   switch (docMode) {
@@ -111,11 +114,38 @@ function preprocessProfileForMode(docMode) {
   return null;
 }
 
+/** Fictional sample for the formatting guide (not a real person's resume). */
+const FORMAT_EXAMPLE_MD = `Alex Rivera
+
+(555) 010-2244 | alex.rivera@example.com | github.com/arivera-dev
+
+## Education
+
+State University — Springfield, IL — B.S. Data Science  
+Expected graduation: May 2027 | GPA: 3.82  
+Focus: machine learning, databases, probability  
+
+Riverside Community College — Riverside, CA — A.S. Mathematics  
+Graduated: June 2023  
+Relevant coursework: calculus, linear algebra, statistics  
+
+## Skills
+
+- Python, SQL, Git, Docker
+- Data visualization and experiment design
+`;
+
+const PARSED_MARKER_LABEL = "→ RIGHT:";
+
 const el = {
   form: document.getElementById("pdf-form"),
   md: document.getElementById("md"),
   download: document.getElementById("download"),
   filenameOut: document.getElementById("filename-out"),
+  exampleMd: document.getElementById("example-md"),
+  exampleParsed: document.getElementById("example-parsed"),
+  exampleParseCompact: document.getElementById("example-parse-compact"),
+  exampleParseUltra: document.getElementById("example-parse-ultra"),
   modeButtons: {
     cover: document.getElementById("mode-cover"),
     resume: document.getElementById("mode-resume"),
@@ -167,75 +197,26 @@ function stripHtmlBlock(raw) {
   return raw.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-/**
- * Compact / ultra resume: join education sub-lines; optional Focus on right column (ultra only).
- * @param {{ joinFocusToExpected: boolean }} profile
- */
-function preprocessResumeMarkdown(md, profile) {
-  const lines = md.split(/\r?\n/);
-  const out = [];
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    while (i + 1 < lines.length) {
-      const next = lines[i + 1].trim();
-      if (!next || next.startsWith("##") || next.startsWith("- ")) break;
-
-      const base = line.trimEnd().replace(/  +$/, "");
-      const baseTrim = base.trim();
-
-      const joinSchool =
-        (baseTrim.includes("North Seattle College") && /^Expected graduation:/i.test(next)) ||
-        (baseTrim.includes("Whitman College") && /^Graduated Spring/i.test(next)) ||
-        ((baseTrim.includes("Whitman College") || /^Graduated Spring/i.test(baseTrim)) &&
-          /^Statistics and quantitative/i.test(next));
-
-      const joinFocus =
-        profile.joinFocusToExpected &&
-        line.includes(EDU_ROW_MARKER) &&
-        /^Focus:/i.test(next);
-
-      if (joinSchool || joinFocus) {
-        if (line.includes(EDU_ROW_MARKER)) {
-          const splitIdx = line.indexOf(EDU_ROW_MARKER);
-          const left = line.slice(0, splitIdx);
-          const right = line
-            .slice(splitIdx + 1)
-            .trimEnd()
-            .replace(/  +$/, "");
-          line = `${left}${EDU_ROW_MARKER}${right} | ${next}`;
-        } else {
-          line = `${base}${EDU_ROW_MARKER}${next}`;
-        }
-        i += 1;
-        continue;
-      }
-      break;
-    }
-    out.push(line);
-    // Compact: Focus stays on its own line below the split row
-    if (
-      !profile.joinFocusToExpected &&
-      line.includes(EDU_ROW_MARKER) &&
-      i + 1 < lines.length
-    ) {
-      const peek = lines[i + 1].trim();
-      if (peek && !peek.startsWith("##") && !peek.startsWith("- ")) {
-        out.push("");
-      }
-    }
+function safeEducationPreprocess(md, profile) {
+  if (typeof EducationPreprocess !== "undefined") {
+    return EducationPreprocess.safePreprocessResumeMarkdown(md, profile);
   }
-  return out.join("\n");
+  return md;
 }
 
 /** Resume: school on the left, joined graduation/coursework flush right */
 function resumeEducationSplitRow(text, layout) {
-  if (!layout.compactEducationRows || typeof text !== "string" || !text.includes(EDU_ROW_MARKER)) {
+  const marker = eduRowMarker();
+  if (!layout.compactEducationRows || typeof text !== "string" || !text.includes(marker)) {
     return null;
   }
-  const splitIdx = text.indexOf(EDU_ROW_MARKER);
+  const splitIdx = text.indexOf(marker);
   const left = text.slice(0, splitIdx).trim();
-  const right = text.slice(splitIdx + 1).trim();
-  if (!left || !right) return null;
+  const right = text.slice(splitIdx + marker.length).trim();
+  if (!left || !right) {
+    console.warn("Invalid education split row; rendering as plain paragraph.");
+    return null;
+  }
   return {
     columns: [
       { text: left, width: "*", alignment: "left" },
@@ -545,7 +526,7 @@ function pruneEmptyContent(nodes) {
 function markdownToDocDefinition(md, titleHint, docMode = "cover") {
   const layout = layoutForMode(docMode);
   const eduProfile = preprocessProfileForMode(docMode);
-  const source = eduProfile ? preprocessResumeMarkdown(md, eduProfile) : md;
+  const source = eduProfile ? safeEducationPreprocess(md, eduProfile) : md;
 
   marked.setOptions({ mangle: false, headerIds: false, gfm: true });
   let tokens;
@@ -635,4 +616,32 @@ el.md.addEventListener("keydown", (e) => {
   if (!e.repeat) downloadPdf();
 });
 
+function formatParsedForDisplay(text) {
+  const marker = eduRowMarker();
+  return text.split(marker).join(` ${PARSED_MARKER_LABEL} `);
+}
+
+function updateFormatExampleParse(ultra) {
+  if (!el.exampleMd || !el.exampleParsed) return;
+  el.exampleMd.value = FORMAT_EXAMPLE_MD;
+  const profile = { joinFocusToExpected: Boolean(ultra) };
+  let parsed = FORMAT_EXAMPLE_MD;
+  if (typeof EducationPreprocess !== "undefined") {
+    parsed = EducationPreprocess.safePreprocessResumeMarkdown(FORMAT_EXAMPLE_MD, profile);
+  }
+  el.exampleParsed.value = formatParsedForDisplay(parsed);
+  if (el.exampleParseCompact && el.exampleParseUltra) {
+    el.exampleParseCompact.classList.toggle("active", !ultra);
+    el.exampleParseUltra.classList.toggle("active", ultra);
+  }
+}
+
+function initFormatGuide() {
+  if (!el.exampleMd) return;
+  updateFormatExampleParse(false);
+  el.exampleParseCompact?.addEventListener("click", () => updateFormatExampleParse(false));
+  el.exampleParseUltra?.addEventListener("click", () => updateFormatExampleParse(true));
+}
+
 setMode("resume");
+initFormatGuide();

@@ -169,3 +169,133 @@ label[for="md"] {
   font-size: 0.75rem;
   color: var(--muted);
 }
+
+.format-guide {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.format-guide h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.format-guide h3.example-heading {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.example-intro {
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+
+.guide-block {
+  margin-bottom: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.guide-block summary {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style-position: outside;
+}
+
+.guide-body {
+  padding: 0 0.75rem 0.75rem;
+  font-size: 0.8125rem;
+  color: #c5c7ce;
+}
+
+.guide-body p,
+.guide-body ul,
+.guide-body ol {
+  margin: 0.5rem 0;
+}
+
+.guide-body li {
+  margin: 0.25rem 0;
+}
+
+.guide-body code {
+  font-family: var(--mono);
+  font-size: 0.78em;
+  background: #2c2e33;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+
+.example-parse-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.example-parse-label {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.example-parse-toolbar button {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8125rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.example-parse-toolbar button:hover {
+  color: var(--text);
+}
+
+.example-parse-toolbar button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.example-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 720px) {
+  .example-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.example-pane label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  margin-bottom: 0.35rem;
+}
+
+.example-box {
+  width: 100%;
+  min-height: 220px;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #1e1f23;
+  color: #b8bac0;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  resize: vertical;
+}

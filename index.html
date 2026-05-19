@@ -59,11 +59,96 @@
           <code>http://localhost:8765</code>.
         </p>
       </form>
+
+      <section class="format-guide" aria-labelledby="format-guide-heading">
+        <h2 id="format-guide-heading">Formatting guide</h2>
+
+        <details class="guide-block" open>
+          <summary>Education section (Resume compact / ultra compact only)</summary>
+          <div class="guide-body">
+            <p>
+              Joining and left/right layout run <strong>only</strong> under
+              <code>## Education</code> (also <code>## Education and Training</code>,
+              <code>## Academic Background</code>, <code>## Academics</code>). Other sections are not rewritten.
+            </p>
+            <p><strong>Typical pattern (two or three lines per school):</strong></p>
+            <ol>
+              <li>
+                <strong>Institution line</strong> — school, location, degree (e.g.
+                <code>State University — City, ST — B.S. Major</code>). Use <code>—</code> or <code>|</code> separators.
+              </li>
+              <li>
+                <strong>Meta line</strong> — dates and GPA (e.g.
+                <code>Expected graduation: May 2027 | GPA: 3.82</code> or <code>Graduated: June 2023</code>).
+              </li>
+              <li>
+                <strong>Detail line</strong> (optional) —
+                <code>Focus:</code>, <code>Relevant coursework:</code>, honors, etc.
+              </li>
+            </ol>
+            <p>
+              <strong>Compact</strong> puts institution (left) and meta (right) on one PDF row; detail stays on the next line.
+              <strong>Ultra compact</strong> also pulls detail onto the right column to save height.
+            </p>
+            <p>Auto-join runs only when the first line looks like an institution and the next like meta. Otherwise lines stay as written.</p>
+            <p><strong>Optional HTML comments</strong> (stripped from the PDF):</p>
+            <ul>
+              <li><code>&lt;!-- edu-join-next --&gt;</code> — force the next line onto the right column</li>
+              <li><code>&lt;!-- edu-join-next:2 --&gt;</code> — join the next two lines to the right</li>
+              <li><code>&lt;!-- edu-no-join --&gt;</code> — skip auto-join for this line and the next</li>
+              <li><code>&lt;!-- edu-compact-off --&gt;</code> — disable education joins for that section</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-block">
+          <summary>General Markdown notes</summary>
+          <div class="guide-body">
+            <ul>
+              <li>Section titles: <code>## Section name</code> (only <code>##</code> headings are styled as section headers).</li>
+              <li>Bullets: lines starting with <code>- </code> (space after the hyphen).</li>
+              <li>Links: <code>[label](https://example.com)</code> — rendered as clickable text in the PDF.</li>
+              <li>
+                Hard line break inside a paragraph: end a line with <strong>two spaces</strong>, then newline (standard Markdown).
+              </li>
+              <li>Blank line between blocks starts a new paragraph.</li>
+              <li>
+                <strong>Cover letter</strong> and <strong>Resume</strong> modes use normal spacing and do not run education preprocessing.
+              </li>
+              <li>Prefer plain text in the body (avoid <code>**bold**</code> / <code>*italic*</code>) for neutral, ATS-friendly typography.</li>
+            </ul>
+          </div>
+        </details>
+
+        <h3 class="example-heading">Example: sample Markdown and how compact modes parse it</h3>
+        <p class="example-intro">
+          Fictional resume excerpt below. The parsed view shows split markers as
+          <code>→ RIGHT:</code> (school stays left of the marker; everything after it is right-aligned in the PDF).
+        </p>
+
+        <div class="example-parse-toolbar" role="group" aria-label="Example parse mode">
+          <span class="example-parse-label">Show parse for:</span>
+          <button type="button" id="example-parse-compact" class="active">Compact</button>
+          <button type="button" id="example-parse-ultra">Ultra compact</button>
+        </div>
+
+        <div class="example-grid">
+          <div class="example-pane">
+            <label for="example-md">Sample Markdown (input)</label>
+            <textarea id="example-md" class="example-box" readonly spellcheck="false" aria-readonly="true"></textarea>
+          </div>
+          <div class="example-pane">
+            <label for="example-parsed">After education preprocess (compact / ultra)</label>
+            <textarea id="example-parsed" class="example-box" readonly spellcheck="false" aria-readonly="true"></textarea>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.12/build/pdfmake.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.12/build/vfs_fonts.js"></script>
+    <script src="education-preprocess.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

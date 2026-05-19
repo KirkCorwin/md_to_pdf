@@ -43,8 +43,44 @@ Copy these files into the repo that backs your user site (often `username.github
 - Add an empty `.nojekyll` at the site root if GitHub Pages ignores files (included in this repo).
 - For offline or strict CSP, vendor `marked`, `pdfmake`, and `vfs_fonts` from the versions in `index.html` and switch script `src` to relative paths.
 
+## Education layout (compact / ultra only)
+
+Preprocessing runs **only** under `## Education` (also `## Education and Training`, `## Academic Background`, `## Academics`). It does not rewrite other sections.
+
+### Automatic heuristics
+
+Within Education, consecutive lines are classified (no school names hardcoded):
+
+| Line type | Examples |
+| --------- | -------- |
+| Institution | Contains University/College + degree or `—` / `\|` separators |
+| Meta | `Expected graduation`, `Graduated`, `GPA`, `Class of`, `May 2024`, etc. |
+| Detail | `Focus:`, `Relevant coursework:`, or short follow-up prose |
+
+- **Compact:** institution + meta → one PDF row (school left, dates/GPA right). Detail lines stay below.
+- **Ultra:** same, plus detail lines are appended on the right column to save vertical space.
+
+If institution + meta do not both match, lines are left unchanged.
+
+### Optional HTML comments
+
+| Comment | Effect |
+| ------- | ------ |
+| `<!-- edu-join-next -->` | Force-join the next line to the right column |
+| `<!-- edu-join-next:2 -->` | Join the next two lines to the right |
+| `<!-- edu-no-join -->` | Skip auto-join for this line and the next |
+| `<!-- edu-compact-off -->` | Disable all education joins for that Education section |
+
+Comments are stripped before rendering.
+
+### Tests
+
+```bash
+node test-education-preprocess.mjs
+```
+
 ## Notes
 
 - **Page size:** US Letter. Standard modes use ~0.75" margins; compact modes use ~0.25" side margins.
 - Very large documents can be slow in the browser.
-- Resume compact/ultra modes include optional Markdown preprocessing for common education line patterns (school + graduation on one row). Other Markdown passes through unchanged.
+- If preprocessing throws, the app falls back to the original Markdown (see browser console).
